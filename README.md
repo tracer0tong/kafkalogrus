@@ -17,13 +17,20 @@ import kl "github.com/tracer0tong/kafkalogrus"
 ### Create a hook (KafkaHook)
 
 ```Go
-NewKafkaLogrusHook(id string, levels []logrus.Level, formatter logrus.Formatter, brokers []string, defaultTopic string, injectHostname bool) (*KafkaHook, error)
+NewKafkaLogrusHook(id string, 
+                   levels []logrus.Level, 
+                   formatter logrus.Formatter, 
+                   brokers []string, 
+                   defaultTopic string, 
+                   injectHostname bool) (*KafkaHook, error)
 ```
 
-- id: Hook Id
+- id: hook identifier
 - levels: [logrus.Levels](https://godoc.org/github.com/sirupsen/logrus#Level) supported by the hook
 - formatter: [logrus.Formatter](https://godoc.org/github.com/sirupsen/logrus#Formatter) used by the hook
 - brokers: Kafka brokers
+- defaultTopic: default Kafka topic for messages
+- injectHostname: if true, will inject os.Hostname() to each request
 
 For example:
 
