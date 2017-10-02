@@ -1,10 +1,9 @@
 package kafkalogrus
 
 import (
+	"github.com/sirupsen/logrus"
 	"testing"
 	"time"
-
-	"github.com/sirupsen/logrus"
 )
 
 func TestKafkaHook(t *testing.T) {
@@ -15,6 +14,7 @@ func TestKafkaHook(t *testing.T) {
 		&logrus.JSONFormatter{},
 		[]string{"127.0.0.1:9092"},
 		"test",
+		true,
 		true)
 
 	if err != nil {
@@ -35,13 +35,9 @@ func TestKafkaHook(t *testing.T) {
 
 	// Add topics
 	l := logger.WithField("topic", "nondefaulttopic")
-
 	l.Debug("This must not be logged")
-
 	l.Info("This is an Info msg")
-
 	l.Warn("This is a Warn msg")
-
 	l.Error("This is an Error msg")
 
 	// Ensure log messages were written to Kafka

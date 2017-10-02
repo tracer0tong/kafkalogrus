@@ -1,9 +1,9 @@
 package main
 
 import (
-	"time"
 	"github.com/sirupsen/logrus"
 	"kafkalogrus"
+	"time"
 )
 
 func main() {
@@ -14,9 +14,10 @@ func main() {
 	if hook, err = kafkalogrus.NewKafkaLogrusHook(
 		"kh",
 		logrus.AllLevels,
-		logrus.JSONFormatter{},
+		&logrus.JSONFormatter{},
 		[]string{"127.0.0.1:9092"},
 		"test",
+		true,
 		true); err != nil {
 		panic(err)
 	}
