@@ -15,7 +15,8 @@ func TestKafkaHook(t *testing.T) {
 		&logrus.JSONFormatter{},
 		[]string{"127.0.0.1:9092"},
 		"test",
-		true)
+		true,
+		nil)
 
 	if err != nil {
 		t.Errorf("Can not create KafkaHook: %v\n", err)
