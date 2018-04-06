@@ -108,11 +108,11 @@ func (hook *KafkaLogrusHook) Fire(entry *logrus.Entry) error {
 
 	topic := hook.defaultTopic
 	if tsRaw, ok := entry.Data["topic"]; ok {
-		ts, ok := tsRaw.(string)
-		if !ok {
+		if ts, ok := tsRaw.(string); !ok {
 			return errors.New("Incorrect topic filed type (should be string)")
+		} else {
+			topic = ts
 		}
-		topic = ts
 	}
 	hook.producer.Input() <- &sarama.ProducerMessage{
 		Key:   partitionKey,
