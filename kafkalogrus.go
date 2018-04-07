@@ -1,6 +1,7 @@
 package kafkalogrus
 
 import (
+	"crypto/tls"
 	"errors"
 	"log"
 	"os"
@@ -10,7 +11,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// KafkaLogrusHook
+// KafkaLogrusHook is the primary struct
 type KafkaLogrusHook struct {
 	id             string
 	defaultTopic   string
@@ -21,19 +22,28 @@ type KafkaLogrusHook struct {
 	producer       sarama.AsyncProducer
 }
 
-// Create a new KafkaHook
+// NewKafkaLogrusHook creates a new KafkaHook
 func NewKafkaLogrusHook(id string,
 	levels []logrus.Level,
 	formatter logrus.Formatter,
 	brokers []string,
 	defaultTopic string,
-	injectHostname bool) (*KafkaLogrusHook, error) {
+	injectHostname bool,
+	tls *tls.Config) (*KafkaLogrusHook, error) {
 	var err error
 	var producer sarama.AsyncProducer
 	kafkaConfig := sarama.NewConfig()
 	kafkaConfig.Producer.RequiredAcks = sarama.WaitForLocal       // Only wait for the leader to ack
 	kafkaConfig.Producer.Compression = sarama.CompressionSnappy   // Compress messages
 	kafkaConfig.Producer.Flush.Frequency = 500 * time.Millisecond // Flush batches every 500ms
+
+	// check here if provided *tls.Config is not nil and assign to the sarama config
+	// NOTE: we automatically enabled the TLS config because sarama would error out if our
+	//       config were non-nil but disabled. To avoid issue father down the stack, we enable.
+	if tls != nil {
+		kafkaConfig.Net.TLS.Enable = true
+		kafkaConfig.Net.TLS.Config = tls
+	}
 
 	if producer, err = sarama.NewAsyncProducer(brokers, kafkaConfig); err != nil {
 		return nil, err
@@ -63,14 +73,17 @@ func NewKafkaLogrusHook(id string,
 	return hook, nil
 }
 
+// Id returns the internal ID of the hook
 func (hook *KafkaLogrusHook) Id() string {
 	return hook.id
 }
 
+// Levels is required to implement the hook interface from logrus
 func (hook *KafkaLogrusHook) Levels() []logrus.Level {
 	return hook.levels
 }
 
+// Fire is required to implement the hook interface from logrus
 func (hook *KafkaLogrusHook) Fire(entry *logrus.Entry) error {
 	var partitionKey sarama.ByteEncoder
 	var b []byte
