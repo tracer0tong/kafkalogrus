@@ -39,7 +39,7 @@ func NewKafkaLogrusHook(id string,
 
 	// check here if provided *tls.Config is not nil and assign to the sarama config
 	// NOTE: we automatically enabled the TLS config because sarama would error out if our
-	//       config were non-nil but disabled. To avoid issue father down the stack, we enable.
+	//       config were non-nil but disabled. To avoid issue futher down the stack, we enable.
 	if tls != nil {
 		kafkaConfig.Net.TLS.Enable = true
 		kafkaConfig.Net.TLS.Config = tls
@@ -89,7 +89,7 @@ func (hook *KafkaLogrusHook) Fire(entry *logrus.Entry) error {
 	var b []byte
 	var err error
 
-	t, _ := entry.Data["time"].(time.Time)
+	t := entry.Time
 	if b, err = t.MarshalBinary(); err != nil {
 		return err
 	}
